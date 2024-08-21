@@ -1,0 +1,10 @@
+{
+    "default_directory": "~/Desktop/TestDesktop",
+    "archive_directory": "~/Desktop/TestDesktop/Archive",
+    "document_extensions": [".pdf", ".txt", ".doc", ".docx", ".odt", ".rtf", ".tex", ".wps"],
+    "image_extensions": [".jpeg", ".jpg", ".png", ".gif", ".bmp", ".tiff", ".tif", ".webp", ".svg", ".ico"],
+    "video_extensions": [".mp4", ".mkv", ".3pg", ".m4v", ".webm", ".mov", ".avi", ".wmv"],
+    "excluded_extensions": [".exe", ".dll", ".sys", ".ini", ".bat", ".lnk", ".conf", ".cfg", ".dat", ".sav"],
+    "retention_days": 30,
+    "database_name":"desktop_cleaner.db"
+}
