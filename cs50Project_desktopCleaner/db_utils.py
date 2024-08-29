@@ -46,4 +46,4 @@ def fetch_activity_summary(conn: sqlite3.Connection, session_id: str) -> Tuple:
 if __name__ == "__main__":
     print("db_utils is successful")
    
-    print(sys.path)
+   

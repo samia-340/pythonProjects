@@ -2,21 +2,33 @@ import os
 import shutil
 import uuid
 import sqlite3
+from typing import Tuple
 from pathlib import Path
 from datetime import datetime
-import logging as log
+import logging 
+
+
+log = logging.getLogger('cleaner')# Create a logger object named 'cleaner'
+log.setLevel(logging.INFO)  # Adjust as needed
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+console_handler = logging.StreamHandler()# Create a handler that will output log messages to the console
+console_handler.setFormatter(formatter)
+log.addHandler(console_handler)# Add the console handler to the logger
+log.propagate = False # Prevent the logger from propagating messages to the root logger
+
+
 # Attempt to import necessary functions from the config module
 try:
     from config import load_config, get_default_directory, get_archive_directory
-    print("Imports from config are successful!")
+    log.info("Imports from config are successful!")
 except ImportError as e:
-    print(f"ImportError: {e}")#
+    log.error(f"ImportError: {e}")
 # Attempt to import necessary functions from the db_utils module
 try:
     from db_utils import create_activity_log_table, insert_activity_log, fetch_activity_summary
-    print("Imports from db_utils are successful!")
+    log.info("Imports from db_utils are successful!")
 except ImportError as e:
-    print(f"ImportError: {e}")
+    log.error(f"ImportError: {e}")
 
 class DesktopCleaner:
     def __init__(self, config_path: str) -> None:
@@ -57,13 +69,13 @@ class DesktopCleaner:
         file_access_time = os.path.getatime(file_path)
         file_access_date = datetime.fromtimestamp(file_access_time)
         return (datetime.now() - file_access_date).days >= self._retention_policy_days
-
+    # this function calls the function of db_utils module to log the activity in db
     def log_activity(self, action: str, source: Path, destination: Path) -> None:
         try:
             insert_activity_log(self._conn, self._session_id, action, str(source), str(destination))
         except sqlite3.Error as e:
             log.error(f"Database error: {e}")
-
+    #this function makes sure the existance of destination folders
     def prepare_folders(self) -> None:
         for folder in self._destinations.values():
             os.makedirs(folder, exist_ok=True)
@@ -105,11 +117,11 @@ class DesktopCleaner:
                         elif file_extension in self._vid_supported_ext:
                             self.move_file(source_file, self._destinations["videos"])
 
-    def generate_summary(self) -> None:
+    def generate_summary(self) -> Tuple:
         """Generates a summary of the cleanup operation."""
         activities=fetch_activity_summary(self._conn,self._session_id)
         log.info("Summary of Activities:")
-        log.info("\nAction Counts:")
+        log.info("Action Counts:")
         log.debug(f"Activities[0]: {activities[0]}")
         for action, count in activities[0]:  # Display counts of actions
             #print(f"{action}: {count} times")
@@ -119,7 +131,9 @@ class DesktopCleaner:
         print("\nRecent Actions:")
         # Loop through to display detailed summary
         for timestamp, action, source, destination in activities[1]:
-            print(f"{timestamp} - {action}: {source} -> {destination}")
+            #print(f"{timestamp} - {action}: {source} -> {destination}")
+            log.info(f"{timestamp} - {action}: {source} -> {destination}")
+        return activities   
 
     def close_connection(self) -> None:
         """Closes the database connection."""

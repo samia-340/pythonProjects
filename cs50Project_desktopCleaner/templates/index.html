@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cleanup Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cleanup Summary for Session: {{ session_id }}</h1>
+
+    <h2>Action Counts</h2>
+    <ul>
+        {% for action, count in summary[0] %}
+            <li>{{ action }}: {{ count }} times</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Recent Actions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Date/Time</th>
+                <th>Action</th>
+                <th>Source</th>
+                <th>Destination</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for timestamp, action, source, destination in summary[1] %}
+                <tr>
+                    <td>{{ timestamp }}</td>
+                    <td>{{ action }}</td>
+                    <td>{{ source }}</td>
+                    <td>{{ destination }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
